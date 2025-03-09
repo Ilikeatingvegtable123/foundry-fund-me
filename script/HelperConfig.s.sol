@@ -10,21 +10,31 @@ pragma solidity ^0.8.18;
 import {Script} from "forge-std/Script.sol";
 import {MockV3Aggregator} from "../test/mocks/MockAggregatorV3Interface.sol";
 
-contract HelperConfig is Script {
+abstract contract CodeConstants {
+    uint8 public constant DECIMALS = 8;
+    int256 public constant INITIAL_PRICE = 2000e8;
+
+    /*//////////////////////////////////////////////////////////////
+                               CHAIN IDS
+    //////////////////////////////////////////////////////////////*/
+    uint256 public constant ETH_SEPOLIA_CHAIN_ID = 11155111;
+    uint256 public constant ZKSYNC_SEPOLIA_CHAIN_ID = 300;
+    uint256 public constant LOCAL_CHAIN_ID = 31337;
+    uint256 public constant ETH_MAINNET_CHAIN_ID = 1;
+}
+
+contract HelperConfig is Script, CodeConstants {
     NetworkConfig public activeNetworkConfig;
 
     struct NetworkConfig {
         address priceFeed;
     }
 
-    uint8 constant DECIMALS = 8;
-    int256 constant INITIAL_PRICE = 2000e8;
-
     // Check and configure for the chain ID
     constructor() {
-        if (block.chainid == 11155111) {
+        if (block.chainid == ETH_SEPOLIA_CHAIN_ID) {
             activeNetworkConfig = getSepoliaEthConfig();
-        } else if (block.chainid == 1) {
+        } else if (block.chainid == ETH_MAINNET_CHAIN_ID) {
             activeNetworkConfig = getEthMainnetConfig();
         } else {
             activeNetworkConfig = getOrCreateAnvilNetworkConfig();
